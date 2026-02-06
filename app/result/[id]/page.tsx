@@ -9,6 +9,7 @@ import { RadarChartComponent } from '@/components/result/RadarChart';
 import { ActionPlan } from '@/components/result/ActionPlan';
 import { ResultSummary } from '@/components/result/ResultSummary';
 import { ReflectionQuestions } from '@/components/result/ReflectionQuestions';
+import { StrengthsWeaknesses } from '@/components/result/StrengthsWeaknesses';
 import { ARCHETYPES, getArchetypeKey } from '@/constants/archetypes';
 import { findWeakestMuscle } from '@/lib/logic';
 import { DiagnosisData } from '@/types';
@@ -187,16 +188,19 @@ export default function ResultPage({ params }: { params: Promise<{ id: string }>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-3 gap-4 text-center">
                   <div className="p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">뿌리 (Root)</p>
+                    <p className="text-sm text-gray-600 mb-1">태도</p>
                     <p className="text-xl font-bold text-blue-600">{data.result.rootDominance}</p>
+                    <p className="text-xs text-gray-500 mt-1">{data.scores.root[data.result.rootDominance].toFixed(1)}점</p>
                   </div>
                   <div className="p-4 bg-purple-50 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">주력 엔진</p>
                     <p className="text-xl font-bold text-purple-600">{data.result.majorMuscle}</p>
+                    <p className="text-xs text-gray-500 mt-1">{data.scores.muscle[data.result.majorMuscle].toFixed(1)}점</p>
                   </div>
                   <div className="p-4 bg-pink-50 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">보조 엔진</p>
                     <p className="text-xl font-bold text-pink-600">{data.result.minorMuscle}</p>
+                    <p className="text-xs text-gray-500 mt-1">{data.scores.muscle[data.result.minorMuscle].toFixed(1)}점</p>
                   </div>
                 </div>
                 <p className="text-center text-gray-700 leading-relaxed">
@@ -212,97 +216,16 @@ export default function ResultPage({ params }: { params: Promise<{ id: string }>
             muscleScores={data.scores.muscle}
           />
 
-          {/* Light & Shadow */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="space-y-4"
-          >
-            {/* Light (강점) */}
-            <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
-              <CardHeader>
-                <CardTitle className="text-green-800">✨ Light (강점)</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {archetype.light.split('\n\n').map((paragraph, idx) => {
-                  // 리스트 항목 체크
-                  if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('**실제로')) {
-                    if (paragraph.includes('•')) {
-                      const lines = paragraph.split('\n');
-                      const header = lines.find(line => line.includes('**'));
-                      const items = lines.filter(line => line.trim().startsWith('•'));
-                      return (
-                        <div key={idx}>
-                          {header && <p className="text-gray-800 font-semibold mb-2" dangerouslySetInnerHTML={{ __html: header.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />}
-                          <ul className="space-y-1 ml-4">
-                            {items.map((item, itemIdx) => (
-                              <li key={itemIdx} className="text-gray-700 leading-relaxed list-disc">
-                                {item.replace(/^[•\-]\s*/, '')}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      );
-                    }
-                  }
-                  // 일반 문단
-                  return (
-                    <p 
-                      key={idx} 
-                      className="text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ 
-                        __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong class="text-green-800 font-bold">$1</strong>') 
-                      }}
-                    />
-                  );
-                })}
-              </CardContent>
-            </Card>
+          {/* Strengths & Weaknesses */}
+          <StrengthsWeaknesses
+            muscleScores={data.scores.muscle}
+            majorMuscle={data.result.majorMuscle}
+            minorMuscle={data.result.minorMuscle}
+            lightContent={archetype.light}
+            shadowContent={archetype.shadow}
+          />
 
-            {/* Shadow (약점) */}
-            <Card className="border-2 border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50">
-              <CardHeader>
-                <CardTitle className="text-gray-800">🌑 Shadow (약점)</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {archetype.shadow.split('\n\n').map((paragraph, idx) => {
-                  // 리스트 항목 체크
-                  if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('**이런 상황')) {
-                    if (paragraph.includes('•')) {
-                      const lines = paragraph.split('\n');
-                      const header = lines.find(line => line.includes('**'));
-                      const items = lines.filter(line => line.trim().startsWith('•'));
-                      return (
-                        <div key={idx}>
-                          {header && <p className="text-gray-800 font-semibold mb-2" dangerouslySetInnerHTML={{ __html: header.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />}
-                          <ul className="space-y-1 ml-4">
-                            {items.map((item, itemIdx) => (
-                              <li key={itemIdx} className="text-gray-700 leading-relaxed list-disc">
-                                {item.replace(/^[•\-]\s*/, '')}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      );
-                    }
-                  }
-                  // 일반 문단
-                  return (
-                    <p 
-                      key={idx} 
-                      className="text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ 
-                        __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-bold">$1</strong>') 
-                      }}
-                    />
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Action Plan */}
+          {/* Action Plan - 가장 약한 영역을 위한 실행 가이드 */}
           <ActionPlan weakestMuscle={weakestMuscle} action={archetype.action} />
 
           {/* Reflection Questions */}

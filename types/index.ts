@@ -62,6 +62,10 @@ export interface Archetype {
   shadow: string;
   action: string;
   reflectionQuestions?: string[];
+  commonFeedback?: {
+    light: string[];  // 강점일 때 듣는 말
+    shadow: string[]; // 약점일 때 듣는 말
+  };
   rootDominance: RootType;
   majorMuscle: MuscleType;
   minorMuscle: MuscleType;

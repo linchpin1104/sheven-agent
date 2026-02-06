@@ -73,9 +73,12 @@ export function ActionPlan({ weakestMuscle, action }: ActionPlanProps) {
           <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-amber-200">
             <AlertCircle className="w-5 h-5 text-amber-600 mt-1 flex-shrink-0" />
             <div>
-              <h4 className="font-semibold text-gray-900 mb-1">보완이 필요한 영역</h4>
+              <h4 className="font-semibold text-gray-900 mb-1">가장 약한 영역 집중 공략</h4>
               <p className="text-gray-700">
                 {MUSCLE_ICONS[weakestMuscle]} <strong>{MUSCLE_NAMES[weakestMuscle]}</strong>
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                이 영역을 강화하면 시너지 효과가 극대화됩니다.
               </p>
             </div>
           </div>
