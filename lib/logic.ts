@@ -1,4 +1,4 @@
-import { RootScores, MuscleScores, DiagnosisResult, RootType, MuscleType } from '@/types';
+import { RootScores, MuscleScores, DiagnosisResult, RootType, MuscleType, ScoreDetails } from '@/types';
 import { REVERSE_INDICES } from '@/constants/questions';
 import { ARCHETYPES, getArchetypeKey } from '@/constants/archetypes';
 
@@ -6,7 +6,7 @@ import { ARCHETYPES, getArchetypeKey } from '@/constants/archetypes';
  * 역채점 적용 함수
  * 지정된 인덱스의 점수를 6 - 점수로 변환
  */
-function applyReverseCoding(answers: number[]): number[] {
+export function applyReverseCoding(answers: number[]): number[] {
   return answers.map((score, index) => {
     if (REVERSE_INDICES.includes(index)) {
       return 6 - score;
@@ -22,6 +22,94 @@ function calculateAverage(scores: number[]): number {
   if (scores.length === 0) return 0;
   const sum = scores.reduce((acc, score) => acc + score, 0);
   return Number((sum / scores.length).toFixed(2));
+}
+
+/**
+ * 세부 점수 계산 함수
+ * 역채점 적용 후 각 요인별 세부 점수를 반환
+ */
+export function calculateScoreDetails(answers: number[]): ScoreDetails {
+  if (answers.length !== 84) {
+    throw new Error('답변은 정확히 84개여야 합니다.');
+  }
+
+  // 역채점 적용
+  const processedAnswers = applyReverseCoding(answers);
+
+  // ROOT 세부 점수
+  const mindQuestions = Array.from({ length: 12 }, (_, i) => i);
+  const willQuestions = Array.from({ length: 12 }, (_, i) => i + 12);
+  const heartQuestions = Array.from({ length: 12 }, (_, i) => i + 24);
+
+  const mindScores = mindQuestions.map(i => processedAnswers[i]);
+  const willScores = willQuestions.map(i => processedAnswers[i]);
+  const heartScores = heartQuestions.map(i => processedAnswers[i]);
+
+  // MUSCLE 세부 점수
+  const headQuestions = Array.from({ length: 12 }, (_, i) => i + 36);
+  const handQuestions = Array.from({ length: 12 }, (_, i) => i + 48);
+  const soulQuestions = Array.from({ length: 24 }, (_, i) => i + 60);
+
+  const headScores = headQuestions.map(i => processedAnswers[i]);
+  const handScores = handQuestions.map(i => processedAnswers[i]);
+  const soulScores = soulQuestions.map(i => processedAnswers[i]);
+
+  // SOUL 서브팩터 (BODY + LEADERSHIP)
+  const bodyQuestions = Array.from({ length: 12 }, (_, i) => i + 60);
+  const leadershipQuestions = Array.from({ length: 12 }, (_, i) => i + 72);
+
+  const bodyScores = bodyQuestions.map(i => processedAnswers[i]);
+  const leadershipScores = leadershipQuestions.map(i => processedAnswers[i]);
+
+  return {
+    processedAnswers,
+    rootDetails: {
+      MIND: {
+        scores: mindScores,
+        avg: calculateAverage(mindScores),
+        questions: mindQuestions,
+      },
+      WILL: {
+        scores: willScores,
+        avg: calculateAverage(willScores),
+        questions: willQuestions,
+      },
+      HEART: {
+        scores: heartScores,
+        avg: calculateAverage(heartScores),
+        questions: heartQuestions,
+      },
+    },
+    muscleDetails: {
+      HEAD: {
+        scores: headScores,
+        avg: calculateAverage(headScores),
+        questions: headQuestions,
+      },
+      HAND: {
+        scores: handScores,
+        avg: calculateAverage(handScores),
+        questions: handQuestions,
+      },
+      SOUL: {
+        scores: soulScores,
+        avg: calculateAverage(soulScores),
+        questions: soulQuestions,
+        subFactors: {
+          BODY: {
+            scores: bodyScores,
+            avg: calculateAverage(bodyScores),
+            questions: bodyQuestions,
+          },
+          LEADERSHIP: {
+            scores: leadershipScores,
+            avg: calculateAverage(leadershipScores),
+            questions: leadershipQuestions,
+          },
+        },
+      },
+    },
+  };
 }
 
 /**
@@ -155,6 +243,7 @@ export function determineMicroArchetype(
     majorMuscle,
     minorMuscle,
     level,
+    archetype, // 전체 archetype 객체 포함
   };
 }
 
@@ -180,6 +269,7 @@ export function runDiagnosis(answers: number[]) {
   // 점수 계산
   const rootScores = calculateRootScores(answers);
   const muscleScores = calculateMuscleScores(answers);
+  const scoreDetails = calculateScoreDetails(answers);
 
   // 유형 결정
   const result = determineMicroArchetype(rootScores, muscleScores);
@@ -188,6 +278,7 @@ export function runDiagnosis(answers: number[]) {
     scores: {
       root: rootScores,
       muscle: muscleScores,
+      details: scoreDetails,
     },
     result,
   };

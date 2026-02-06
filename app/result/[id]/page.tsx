@@ -118,12 +118,16 @@ export default function ResultPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const archetypeKey = getArchetypeKey(
-    data.result.rootDominance,
-    data.result.majorMuscle,
-    data.result.minorMuscle
-  );
-  const archetype = ARCHETYPES[archetypeKey];
+  // DB에 저장된 archetype 사용 (없으면 fallback으로 constants에서 찾기)
+  const archetype = data.result.archetype || (() => {
+    const archetypeKey = getArchetypeKey(
+      data.result.rootDominance,
+      data.result.majorMuscle,
+      data.result.minorMuscle
+    );
+    return ARCHETYPES[archetypeKey];
+  })();
+  
   const weakestMuscle = findWeakestMuscle(data.scores.muscle);
 
   if (!archetype) {

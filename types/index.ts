@@ -16,9 +16,55 @@ export interface MuscleScores {
   SOUL: number;
 }
 
+export interface FactorDetail {
+  scores: number[];
+  avg: number;
+  questions: number[];
+}
+
+export interface SubFactorDetail {
+  BODY: FactorDetail;
+  LEADERSHIP: FactorDetail;
+}
+
+export interface MuscleDetail extends FactorDetail {
+  subFactors?: SubFactorDetail;
+}
+
+export interface ScoreDetails {
+  processedAnswers: number[]; // 역채점 적용 후 84개 점수
+  rootDetails: {
+    MIND: FactorDetail;
+    WILL: FactorDetail;
+    HEART: FactorDetail;
+  };
+  muscleDetails: {
+    HEAD: FactorDetail;
+    HAND: FactorDetail;
+    SOUL: MuscleDetail; // SOUL은 BODY + LEADERSHIP 서브팩터 포함
+  };
+}
+
 export interface DiagnosisScores {
   root: RootScores;
   muscle: MuscleScores;
+  details?: ScoreDetails; // 세부 점수 정보 (선택사항 - 이전 데이터 호환성)
+}
+
+export interface Archetype {
+  id: string;
+  name: string;
+  alias: string;
+  subtitle: string;
+  oneliner: string;
+  description: string;
+  light: string;
+  shadow: string;
+  action: string;
+  reflectionQuestions?: string[];
+  rootDominance: RootType;
+  majorMuscle: MuscleType;
+  minorMuscle: MuscleType;
 }
 
 export interface DiagnosisResult {
@@ -28,10 +74,15 @@ export interface DiagnosisResult {
   majorMuscle: MuscleType;
   minorMuscle: MuscleType;
   level: LevelType;
+  archetype: Archetype; // 전체 archetype 객체 포함
 }
 
 export interface UserInfo {
-  name?: string;
+  name: string;
+  age?: number;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  position?: string;
+  businessCategory?: string;
   email?: string;
   startupStage?: StartupStage;
 }
@@ -50,20 +101,4 @@ export interface Question {
   text: string;
   category: RootType | MuscleType;
   isReverse: boolean;
-}
-
-export interface Archetype {
-  id: string;
-  name: string;
-  alias: string;
-  subtitle: string;
-  oneliner: string;
-  description: string;
-  light: string;
-  shadow: string;
-  action: string;
-  reflectionQuestions?: string[];
-  rootDominance: RootType;
-  majorMuscle: MuscleType;
-  minorMuscle: MuscleType;
 }

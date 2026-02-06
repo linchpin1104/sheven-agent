@@ -45,13 +45,14 @@ export async function GET(
       );
     }
 
-    // 응답 반환 (rawAnswers는 제외)
+    // 응답 반환 (rawAnswers 포함)
     return NextResponse.json({
       id: data.id,
       createdAt: data.createdAt,
       userInfo: data.userInfo,
       scores: data.scores,
       result: data.result,
+      rawAnswers: data.rawAnswers, // 84개 문항 응답 포함
     });
   } catch (error) {
     console.error('결과 조회 중 오류 발생:', error);

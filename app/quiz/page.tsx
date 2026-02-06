@@ -20,12 +20,20 @@ export default function QuizPage() {
     answers,
     setAnswer,
     isComplete,
+    userInfo,
   } = useQuizStore();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [focusedQuestionIndex, setFocusedQuestionIndex] = useState(0);
+
+  // 사용자 정보 확인 - 없으면 user-info로 리다이렉트
+  useEffect(() => {
+    if (mounted && !userInfo?.name) {
+      router.push('/user-info');
+    }
+  }, [mounted, userInfo, router]);
 
   useEffect(() => {
     setMounted(true);
@@ -72,7 +80,10 @@ export default function QuizPage() {
       const response = await fetch('/api/diagnosis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ 
+          answers,
+          userInfo, // 사용자 정보 포함
+        }),
       });
 
       if (!response.ok) {
@@ -88,7 +99,7 @@ export default function QuizPage() {
       alert('진단 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
       setIsSubmitting(false);
     }
-  }, [isComplete, answers, router]);
+  }, [isComplete, answers, userInfo, router]);
 
   // 키보드 입력 처리
   useEffect(() => {

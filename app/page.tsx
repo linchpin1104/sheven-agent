@@ -81,7 +81,7 @@ export default function HomePage() {
               transition={{ delay: 0.6, duration: 0.5 }}
             >
               <Button
-                onClick={() => router.push('/quiz')}
+                onClick={() => router.push('/user-info')}
                 className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 진단 시작하기 →
