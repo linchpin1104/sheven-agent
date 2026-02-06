@@ -188,18 +188,78 @@ Root (3) × Major Muscle (3) × Minor Muscle (3) = 27가지 조합
 
 ## 📱 배포
 
-### Vercel (권장)
+> 📖 **상세 배포 가이드**: [DEPLOYMENT.md](./DEPLOYMENT.md) 참고
+
+### 빌드 전 체크리스트
 
 ```bash
-vercel deploy
+# 전체 검사 (타입 체크 + 린트 + 테스트)
+npm run check
+
+# 프로덕션 빌드
+npm run build
+```
+
+### Vercel 배포 (권장)
+
+#### GitHub 연동 배포
+1. [Vercel Dashboard](https://vercel.com/dashboard)에 로그인
+2. "Import Project" → GitHub 저장소 선택
+3. 환경 변수 설정 (아래 참고)
+4. "Deploy" 클릭
+
+#### CLI 배포
+```bash
+# Vercel CLI 설치
+npm install -g vercel
+
+# 배포
+vercel --prod
 ```
 
 ### 환경 변수 설정
 
-Vercel 대시보드에서 환경 변수를 설정하세요:
-- `NEXT_PUBLIC_FIREBASE_*`: Firebase 클라이언트 설정
-- `FIREBASE_SERVICE_ACCOUNT_KEY`: Firebase Admin SDK 키
-- `NEXT_PUBLIC_BASE_URL`: 배포된 도메인
+Vercel Dashboard > Settings > Environment Variables에서 설정:
+
+#### 필수 환경 변수
+```env
+# Firebase 클라이언트 (7개)
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# Firebase Admin SDK (중요!)
+FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
+```
+
+> 📝 **참고**: `env.production.example` 파일 참고
+
+### Firebase 없이 배포하기
+
+Firebase 설정 없이도 배포 가능합니다 (개발/테스트용):
+- ✅ 빌드 성공
+- ✅ 퀴즈 작동
+- ⚠️ 결과가 메모리에만 저장 (서버 재시작 시 삭제)
+- 🚨 프로덕션에서는 Firebase 필수
+
+### 배포 확인
+
+```bash
+# 로컬에서 프로덕션 빌드 테스트
+npm run build
+npm run start
+```
+
+체크리스트:
+- [ ] 랜딩 페이지 로딩
+- [ ] 퀴즈 84문항 작동
+- [ ] 키보드 입력 (1-5, 방향키, Enter)
+- [ ] 결과 제출 성공
+- [ ] 결과 페이지 표시
+- [ ] OG 이미지 생성
 
 ## 🤝 기여
 
