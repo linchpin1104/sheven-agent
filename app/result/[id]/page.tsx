@@ -7,9 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ResultHeader } from '@/components/result/ResultHeader';
 import { RadarChartComponent } from '@/components/result/RadarChart';
 import { ActionPlan } from '@/components/result/ActionPlan';
-import { DetailedAnalysis } from '@/components/result/DetailedAnalysis';
-import { RecommendedResources } from '@/components/result/RecommendedResources';
-import { NextSteps } from '@/components/result/NextSteps';
 import { ResultSummary } from '@/components/result/ResultSummary';
 import { ARCHETYPES, getArchetypeKey } from '@/constants/archetypes';
 import { findWeakestMuscle } from '@/lib/logic';
@@ -215,47 +212,93 @@ export default function ResultPage({ params }: { params: Promise<{ id: string }>
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className="grid md:grid-cols-2 gap-4"
+            className="space-y-4"
           >
+            {/* Light (강점) */}
             <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
               <CardHeader>
                 <CardTitle className="text-green-800">✨ Light (강점)</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{archetype.light}</p>
+              <CardContent className="space-y-3">
+                {archetype.light.split('\n\n').map((paragraph, idx) => {
+                  // 리스트 항목 체크
+                  if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('**실제로')) {
+                    if (paragraph.includes('•')) {
+                      const lines = paragraph.split('\n');
+                      const header = lines.find(line => line.includes('**'));
+                      const items = lines.filter(line => line.trim().startsWith('•'));
+                      return (
+                        <div key={idx}>
+                          {header && <p className="text-gray-800 font-semibold mb-2" dangerouslySetInnerHTML={{ __html: header.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />}
+                          <ul className="space-y-1 ml-4">
+                            {items.map((item, itemIdx) => (
+                              <li key={itemIdx} className="text-gray-700 leading-relaxed list-disc">
+                                {item.replace(/^[•\-]\s*/, '')}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    }
+                  }
+                  // 일반 문단
+                  return (
+                    <p 
+                      key={idx} 
+                      className="text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{ 
+                        __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong class="text-green-800 font-bold">$1</strong>') 
+                      }}
+                    />
+                  );
+                })}
               </CardContent>
             </Card>
 
+            {/* Shadow (약점) */}
             <Card className="border-2 border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50">
               <CardHeader>
                 <CardTitle className="text-gray-800">🌑 Shadow (약점)</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{archetype.shadow}</p>
+              <CardContent className="space-y-3">
+                {archetype.shadow.split('\n\n').map((paragraph, idx) => {
+                  // 리스트 항목 체크
+                  if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('**이런 상황')) {
+                    if (paragraph.includes('•')) {
+                      const lines = paragraph.split('\n');
+                      const header = lines.find(line => line.includes('**'));
+                      const items = lines.filter(line => line.trim().startsWith('•'));
+                      return (
+                        <div key={idx}>
+                          {header && <p className="text-gray-800 font-semibold mb-2" dangerouslySetInnerHTML={{ __html: header.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />}
+                          <ul className="space-y-1 ml-4">
+                            {items.map((item, itemIdx) => (
+                              <li key={itemIdx} className="text-gray-700 leading-relaxed list-disc">
+                                {item.replace(/^[•\-]\s*/, '')}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    }
+                  }
+                  // 일반 문단
+                  return (
+                    <p 
+                      key={idx} 
+                      className="text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{ 
+                        __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-bold">$1</strong>') 
+                      }}
+                    />
+                  );
+                })}
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Action Plan */}
           <ActionPlan weakestMuscle={weakestMuscle} action={archetype.action} />
-
-          {/* Detailed Analysis */}
-          <DetailedAnalysis
-            rootDominance={data.result.rootDominance}
-            majorMuscle={data.result.majorMuscle}
-            minorMuscle={data.result.minorMuscle}
-            rootScores={data.scores.root}
-            muscleScores={data.scores.muscle}
-          />
-
-          {/* Recommended Resources */}
-          <RecommendedResources
-            rootDominance={data.result.rootDominance}
-            weakestMuscle={weakestMuscle}
-          />
-
-          {/* Next Steps */}
-          <NextSteps />
         </div>
 
         {/* Footer */}

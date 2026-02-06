@@ -22,6 +22,39 @@ const MUSCLE_ICONS: Record<MuscleType, string> = {
   SOUL: '❤️',
 };
 
+// 텍스트를 포맷팅하는 함수
+function formatText(text: string) {
+  // **텍스트** -> <strong>
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold">$1</strong>');
+  
+  // 줄바꿈 처리
+  const paragraphs = formatted.split('\n\n');
+  
+  return paragraphs.map((para, idx) => {
+    // 리스트 항목 체크
+    if (para.trim().startsWith('•') || para.trim().startsWith('-')) {
+      const items = para.split('\n').filter(line => line.trim());
+      return (
+        <ul key={idx} className="space-y-2 ml-4">
+          {items.map((item, itemIdx) => {
+            const cleanItem = item.replace(/^[•\-]\s*/, '');
+            return (
+              <li key={itemIdx} className="text-gray-700 leading-relaxed list-disc">
+                <span dangerouslySetInnerHTML={{ __html: cleanItem }} />
+              </li>
+            );
+          })}
+        </ul>
+      );
+    }
+    
+    // 일반 문단
+    return (
+      <p key={idx} className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: para }} />
+    );
+  });
+}
+
 export function ActionPlan({ weakestMuscle, action }: ActionPlanProps) {
   return (
     <motion.div
@@ -36,7 +69,7 @@ export function ActionPlan({ weakestMuscle, action }: ActionPlanProps) {
             성장 처방전
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-amber-200">
             <AlertCircle className="w-5 h-5 text-amber-600 mt-1 flex-shrink-0" />
             <div>
@@ -47,13 +80,13 @@ export function ActionPlan({ weakestMuscle, action }: ActionPlanProps) {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-amber-200">
-            <TrendingUp className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">실행 가이드</h4>
-              <p className="text-gray-700 leading-relaxed">
-                {action}
-              </p>
+          <div className="p-6 bg-white rounded-lg border border-amber-200 space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              <h4 className="font-semibold text-gray-900 text-lg">실행 가이드</h4>
+            </div>
+            <div className="space-y-4">
+              {formatText(action)}
             </div>
           </div>
         </CardContent>
