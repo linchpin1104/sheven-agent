@@ -8,6 +8,7 @@ import { ResultHeader } from '@/components/result/ResultHeader';
 import { RadarChartComponent } from '@/components/result/RadarChart';
 import { ActionPlan } from '@/components/result/ActionPlan';
 import { ResultSummary } from '@/components/result/ResultSummary';
+import { ReflectionQuestions } from '@/components/result/ReflectionQuestions';
 import { ARCHETYPES, getArchetypeKey } from '@/constants/archetypes';
 import { findWeakestMuscle } from '@/lib/logic';
 import { DiagnosisData } from '@/types';
@@ -299,6 +300,11 @@ export default function ResultPage({ params }: { params: Promise<{ id: string }>
 
           {/* Action Plan */}
           <ActionPlan weakestMuscle={weakestMuscle} action={archetype.action} />
+
+          {/* Reflection Questions */}
+          {archetype.reflectionQuestions && archetype.reflectionQuestions.length > 0 && (
+            <ReflectionQuestions questions={archetype.reflectionQuestions} />
+          )}
         </div>
 
         {/* Footer */}

@@ -62,6 +62,7 @@ export interface Archetype {
   light: string;
   shadow: string;
   action: string;
+  reflectionQuestions?: string[];
   rootDominance: RootType;
   majorMuscle: MuscleType;
   minorMuscle: MuscleType;
